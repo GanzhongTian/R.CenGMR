@@ -1,6 +1,6 @@
 #' Censored Mixture Multivariate Regression EM
 #'
-#' @param Y
+#' @param Y the response variable
 #' @param C
 #' @param X
 #' @param G
