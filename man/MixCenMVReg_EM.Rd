@@ -20,19 +20,29 @@ MixCenMVReg_EM(
 )
 }
 \arguments{
-\item{Y}{the response variable}
+\item{Y}{the response variables matrix, N x p.}
 
-\item{Max.iter}{the maximum iteration numbers}
+\item{C}{censored ID matrix, N x p, -1 means left, 0 means observed and 1 means right censored.}
 
-\item{pie_hat}{a vector of initialized Mixing porportions}
+\item{X}{covariates matrix, N x d, with d-1 covariates.}
 
-\item{beta_hat}{a list of initialized Beta matrices}
+\item{G}{the given number of groups.}
 
-\item{sigma_hat}{a list of initialized Sigma matrices}
+\item{Max.iter}{the maximum iteration numbers.}
+
+\item{pie_hat}{a vector of initialized Mixing porportions.}
+
+\item{beta_hat}{a list of initialized Beta matrices, each matrix with d x p, with p response variables and d-1 covariates.}
+
+\item{sigma_hat}{a list of initialized Sigma matrices, each matrix with p x p.}
 
 \item{diff.tol}{the judgement standard of convergence, default value is 1e-3.}
 
-\item{calc_cov}{}
+\item{print}{whether to print the outcome.}
+
+\item{init_class}{initial partition, which needs to be factor format.}
+
+\item{calc_cov}{whether to calculate the covariance matrix.}
 }
 \value{
 Function outputs a list including the following:
@@ -48,7 +58,8 @@ Function outputs a list including the following:
       \item{\code{Sigma}}{a list of estimated initialized Covariance matrices}
       \item{\code{Posterior}}{Posterior probability for each observation in each class}
       \item{\code{Class}}{The predicted outcome of each observation}
-      \item{\code{obs_Info}}{}
+      \item{\code{obs_Info}}{false if choose calc_cov=false}
+      \item{\code{Cov}}{cov matrix}
 }
 }
 \description{

@@ -1,17 +1,17 @@
 #' Censored Mixture Multivariate Regression EM
 #'
-#' @param Y the response variable
-#' @param C
-#' @param X
-#' @param G
-#' @param Max.iter the maximum iteration numbers
-#' @param pie_hat a vector of initialized Mixing porportions
-#' @param beta_hat a list of initialized Beta matrices
-#' @param sigma_hat a list of initialized Sigma matrices
+#' @param Y the response variables matrix, N x p.
+#' @param C censored ID matrix, N x p, -1 means left, 0 means observed and 1 means right censored.
+#' @param X covariates matrix, N x d, with d-1 covariates.
+#' @param G the given number of groups.
+#' @param Max.iter the maximum iteration numbers.
+#' @param pie_hat a vector of initialized Mixing porportions.
+#' @param beta_hat a list of initialized Beta matrices, each matrix with d x p, with p response variables and d-1 covariates.
+#' @param sigma_hat a list of initialized Sigma matrices, each matrix with p x p.
 #' @param diff.tol the judgement standard of convergence, default value is 1e-3.
-#' @param print
-#' @param init_class
-#' @param calc_cov
+#' @param print whether to print the outcome.
+#' @param init_class initial partition, which needs to be factor format.
+#' @param calc_cov whether to calculate the covariance matrix.
 #'
 #' @return Function outputs a list including the following:
 #' \describe{
@@ -26,12 +26,11 @@
 #'       \item{\code{Sigma}}{a list of estimated initialized Covariance matrices}
 #'       \item{\code{Posterior}}{Posterior probability for each observation in each class}
 #'       \item{\code{Class}}{The predicted outcome of each observation}
-#'       \item{\code{obs_Info}}{}
+#'       \item{\code{obs_Info}}{false if choose calc_cov=false}
+#'       \item{\code{Cov}}{cov matrix}
 #' }
 #'
 #' @import matrixStats
-#' @import condMVNorm
-#' @import MomTrunc
 #' @export
 #'
 #' @examples
@@ -40,26 +39,26 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
                         print=TRUE, init_class=NA, calc_cov=FALSE){
 
 
-  N=dim(Y)[1]
-  P=dim(Y)[2]
-  D=dim(X)[2]
+  N=dim(Y)[1] # the number of observations
+  P=dim(Y)[2] # the dimension of response variables
+  D=dim(X)[2] # we have d-1 covariates
 
   if(is.na(sum(as.integer(init_class)))==FALSE){
-      G=length(levels(init_class))
+      G=length(levels(init_class))  # get the number of groups from init_class
   }
 
   if(is.null(colnames(Y))){
-    colnames(Y)=paste(rep('Y',P), 1:P, sep="_")
+    colnames(Y)=paste(rep('Y',P), 1:P, sep="_") # give the column names for input Y.
   }
 
   initial=FALSE
 
   if(all(is.na(pie_hat)==FALSE) & all(is.na(beta_hat)==FALSE) & all(is.na(sigma_hat)==FALSE)){
 
-    initial=TRUE
+    initial=TRUE # all the initial parameter matrices have values.
 
     if(length(beta_hat)==length(sigma_hat) & length(beta_hat)==length(pie_hat)){
-      G=length(beta_hat)
+      G=length(beta_hat) # the length means the number of groups.
     } else {
       stop("Intial pie, beta, sigma lengths are different")
     }
@@ -67,12 +66,12 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
 
     mu_hat=list()
     for(g in 1:G){
-      mu_hat[[g]]=X%*%beta_hat[[g]]
+      mu_hat[[g]]=X%*%beta_hat[[g]] # get the gth group Y_hat with N x p matrix.
     }
   }
 
 
-  all_obs.LogLik=c(-Inf)
+  all_obs.LogLik=c(-Inf) # -Inf = likelihood to 0.
 
   # set initial iteration number:
   iter=0
@@ -83,16 +82,16 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
   while(iter<Max.iter & diff>diff.tol){
     # print(iter)
 
-    if(iter==0 & initial==FALSE){
+    if(iter==0 & initial==FALSE){ # not given initial parameters
 
       ## E-step: computing the conditional posterior probabilities tau_hat
 
       ### First assign every one to be 1/G or a very small value
       #             tau_hat=matrix(rep(1/G,N*G), nrow=N, ncol=G)
       # tau_hat=matrix(rep(0,N*G), nrow=N, ncol=G)
-      tau_hat=matrix(rep(1e-3,N*G), nrow=N, ncol=G)
+      tau_hat=matrix(rep(1e-3,N*G), nrow=N, ncol=G) # set a small number in the matrix N x G.
 
-      if(is.na(sum(as.integer(init_class)))){
+      if(is.na(sum(as.integer(init_class)))){  # if exist NA in given class or not given class.
 
           ### Then randomly assign every one to be 1/G
           subsample=sample(1:N,round(N/10),replace=FALSE)
@@ -105,7 +104,7 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
           }
 
       }
-      pie_hat=apply(tau_hat,2,mean)
+      pie_hat=apply(tau_hat,2,mean) # set the initial pie_hat with given class when initial parameters are not given.
 
       mu_hat=list()
       beta_hat=list()
@@ -113,11 +112,11 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
       for(g in 1:G){
         # mu_hat[[g]]=tau_hat[,g]*Y
 
-        beta_hat[[g]]=solve(t(X)%*%diag(tau_hat[,g])%*%X)%*%t(X)%*%diag(tau_hat[,g])%*%Y
-        mu_hat[[g]]=X%*%beta_hat[[g]]
+        beta_hat[[g]]=solve(t(X)%*%diag(tau_hat[,g])%*%X)%*%t(X)%*%diag(tau_hat[,g])%*%Y   # the beta calculation from linear model, which is also used in EM.
+        mu_hat[[g]]=X%*%beta_hat[[g]]  # estimated Y, N x p, calculated by X and est.beta, which is seemed as the mean of the different groups.
         # sigma_hat[[g]]=cov(tau_hat[,g]*Y)
         # sigma_hat[[g]]=cov(tau_hat[,g]*(Y-mu_hat[[g]]))
-        sigma_hat[[g]]=cov.wt(as.matrix(Y-mu_hat[[g]]),tau_hat[,g])$cov
+        sigma_hat[[g]]=cov.wt(as.matrix(Y-mu_hat[[g]]),tau_hat[,g])$cov  # weighted covariance.
       }
 
 #       beta_hat=list()
@@ -131,7 +130,7 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
 #       }
       # print(beta_hat)
       # print(sigma_hat)
-    }else{
+    }else{   # we have the initial parameters.
 
       for(g in 1:G){
         ## E-step: computing individual observation's contribution to the likelihood
@@ -140,12 +139,12 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
         #                                   c=split(t(C), rep(1:N, each = P)),
         #                                   m=split(t(mu_hat[[g]]), rep(1:N, each = P)),
         #                                   MoreArgs=list(v=sigma_hat[[g]]))
-        log.ind_density[,g]=log(pie_hat[g])+mapply(eval_density,
+        log.ind_density[,g]=log(pie_hat[g])+mapply(eval_density,  #function from util.R
                                                    y=split(t(Y), rep(1:N, each = P)),
                                                    c=split(t(C), rep(1:N, each = P)),
                                                    m=split(t(mu_hat[[g]]), rep(1:N, each = P)),
                                                    MoreArgs=list(v=sigma_hat[[g]]))
-      }
+      }   #log.ind_density NxG
 
         # because some of the values are tooo small
       log.ind_density[is.infinite(log.ind_density)]=-999
