@@ -361,13 +361,13 @@ eval_class=function(p){
 #'
 #' @return a list of data
 #' @export
-#' @import MomTrunc
+#' @import condMVNorm
 #' @examples
 #' set.seed(22)
 #' BETA=list(matrix(c(2,0,20,-2),nrow=2,ncol=2),matrix(c(3,1,25,-3),nrow=2,ncol=2),matrix(c(3.5,2,30,-5),nrow=2,ncol=2))
 #' SIGMA=list(matrix(c(1,0.1,0.1,1),nrow=2,ncol=2),matrix(c(2,0.2,0.2,0.5),nrow=2,ncol=2),matrix(c(0.5,0.3,0.3,2),nrow=2,ncol=2))
 #' PIE=c(.1,.7,.2)
-#'example_true=TrueDataGen(1,1000,PIE,BETA,SIGMA)
+#' example_true=TrueDataGen(1,1000,PIE,BETA,SIGMA)
 #'
 TrueDataGen=function(Replicate=30, n=1000,pie,beta,sigma){
 
