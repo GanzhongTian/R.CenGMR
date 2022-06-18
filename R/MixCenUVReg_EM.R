@@ -1,17 +1,17 @@
-#' Censored Mixture Multivariate Regression EM
+#' Censored Mixture Univariate Regression EM
 #'
-#' @param Y
-#' @param C
-#' @param X
-#' @param G
-#' @param Max.iter the maximum iteration numbers
-#' @param pie_hat a vector of initialized Mixing porportions
-#' @param beta_hat a list of initialized Beta matrices
-#' @param sigma_hat a list of initialized Sigma matrices
+#' @param Y the response variables matrix, N x p.
+#' @param C censored ID matrix, N x p, -1 means left, 0 means observed and 1 means right censored.
+#' @param X covariates matrix, N x d, with d-1 covariates.
+#' @param G the given number of groups.
+#' @param Max.iter the maximum iteration numbers.
+#' @param pie_hat a vector of initialized Mixing porportions.
+#' @param beta_hat a list of initialized Beta matrices, each matrix with d x p, with p response variables and d-1 covariates.
+#' @param sigma_hat a list of initialized Sigma matrices, each matrix with p x p.
 #' @param diff.tol the judgement standard of convergence, default value is 1e-3.
-#' @param print
-#' @param init_class
-#' @param calc_cov
+#' @param print whether to print the outcome.
+#' @param init_class initial partition, which needs to be factor format.
+#' @param calc_cov whether to calculate the covariance matrix.
 #'
 #' @return Function outputs a list including the following:
 #' \describe{
@@ -26,14 +26,14 @@
 #'       \item{\code{Sigma}}{a list of estimated initialized Covariance matrices}
 #'       \item{\code{Posterior}}{Posterior probability for each observation in each class}
 #'       \item{\code{Class}}{The predicted outcome of each observation}
-#'       \item{\code{obs_Info}}{}
+#'       \item{\code{obs_Info}}{false if choose calc_cov=false}
+#'       \item{\code{Cov}}{cov matrix}
 #' }
 #'
 #' @import matrixStats
 #' @import truncnorm
 #' @export
 #'
-#' @examples
 MixCenUVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
                         pie_hat=NA, beta_hat=NA, sigma_hat=NA, diff.tol=1e-3,
                         print=TRUE, init_class=NA,calc_cov=FALSE){
@@ -209,7 +209,7 @@ MixCenUVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
                     return((y-mu)^2)
                 }
                 if(c==1){
-                    return((etruncnorm(a=y, b=Inf, mean=mu, sd=sigma)-mu)^2+v_censnorm(c(y,Inf), mu, sigma))
+                    return((etruncnorm(a=y, b=Inf, mean=mu, sd=sigma)-mu)^2+v_censnorm(c(y,Inf), mu, sigma)) # v_censnorm is defined in utils.R
                 }
                 if(c==-1){
                     return((etruncnorm(a=-Inf, b=y, mean=mu, sd=sigma)-mu)^2+v_censnorm(c(-Inf,y), mu, sigma))

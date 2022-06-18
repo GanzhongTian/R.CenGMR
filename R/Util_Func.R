@@ -90,7 +90,7 @@ eval_density=function(y,c,m,v){
 # Y=Y[1:10,];C=C[1:10,];Y=Y[1:10,];M=mu_hat[[g]][1:10,];V=sigma_hat[[g]]
 # eval_density(Y[i,],C[i,],M[i,],V)
 # Y_star=mapply(eval_density, Y, C, mu_hat[[g]], sigma_hat[[g]])
-#' Evaluate the Y-star in EM
+#' Evaluate the Y-star in multivariate EM
 #'
 #' @param y a p-dimension vectors of continous values: observed manifest vars
 #' @param c a p-dimension vectors of 0,-1,1 indicating censoring directions
@@ -164,6 +164,16 @@ eval_ystar=function(y,c,m,v){
   }
 }
 
+#' Evaluate r in multivariate EM step.
+#'
+#' @param y a p-dimension vectors of continous values: observed manifest vars.
+#' @param c a p-dimension vectors of 0,-1,1 indicating censoring directions.
+#' @param m a p-dimension vectors of continous values: means.
+#' @param v a pxp varcov matrix.
+#'
+#' @return a pxp cond_varcov matrix subjected to 0s for the obs features.
+#' @import MomTrunc
+#'
 eval_r=function(y,c,m,v){
   ############################################################################################
   # input:    -y    :a p-dimension vectors of continous values: observed manifest vars

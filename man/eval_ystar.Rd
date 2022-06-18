@@ -2,7 +2,7 @@
 % Please edit documentation in R/Util_Func.R
 \name{eval_ystar}
 \alias{eval_ystar}
-\title{Evaluate the Y-star in EM}
+\title{Evaluate the Y-star in multivariate EM}
 \usage{
 eval_ystar(y, c, m, v)
 }
@@ -19,5 +19,5 @@ eval_ystar(y, c, m, v)
 a p-dimension vector of obs_y or conditional means of cen_y
 }
 \description{
-Evaluate the Y-star in EM
+Evaluate the Y-star in multivariate EM
 }

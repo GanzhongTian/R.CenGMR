@@ -33,7 +33,6 @@
 #' @import matrixStats
 #' @export
 #'
-#' @examples
 MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
                         pie_hat=NA, beta_hat=NA, sigma_hat=NA, diff.tol=1e-3,
                         print=TRUE, init_class=NA, calc_cov=FALSE){
