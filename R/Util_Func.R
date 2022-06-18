@@ -35,6 +35,7 @@ v_censnorm<-function(cen_interval=c(-Inf,Inf), mu=0, sig=1){
 #' @param v a pxp varcov matrix
 #'
 #' @return a positive real value of the density
+#' @export
 #' @import condMVNorm
 #'
 eval_density=function(y,c,m,v){
