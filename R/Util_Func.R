@@ -350,3 +350,68 @@ eval_subdensity=function(Y,C,X,beta_hat,sigma_hat){
 eval_class=function(p){
   return(which(p==max(p)))
 }
+
+#' Generate data for example
+#'
+#' @param Replicate replicate time
+#' @param n subject numbers
+#' @param pie a list of pie value
+#' @param beta a list of beta matrices
+#' @param sigma a list of sigma matrices
+#'
+#' @return a list of data
+#' @export
+#' @import MomTrunc
+#' @examples
+#' set.seed(22)
+#' BETA=list(matrix(c(2,0,20,-2),nrow=2,ncol=2),matrix(c(3,1,25,-3),nrow=2,ncol=2),matrix(c(3.5,2,30,-5),nrow=2,ncol=2))
+#' SIGMA=list(matrix(c(1,0.1,0.1,1),nrow=2,ncol=2),matrix(c(2,0.2,0.2,0.5),nrow=2,ncol=2),matrix(c(0.5,0.3,0.3,2),nrow=2,ncol=2))
+#' PIE=c(.1,.7,.2)
+#'example_true=TrueDataGen(1,1000,PIE,BETA,SIGMA)
+#'
+TrueDataGen=function(Replicate=30, n=1000,pie,beta,sigma){
+
+  N=n
+
+  G=length(pie) # Num of Clusters
+  P=dim(beta[[1]])[2] # Dimension of Y
+  D=dim(beta[[1]])[1] # Dimension of X (intercpt included)
+
+  out=list()
+  for(i in 1:Replicate){
+    df_X=list()
+    for(g in 1:G){
+      df_X[[g]]=cbind(rep(1,pie[g]*N),do.call('cbind',lapply(rep(pie[g]*N,1),rnorm,0)))
+    }
+
+
+    mu=list()
+    for(g in 1:G){
+      mu[[g]]=df_X[[g]]%*%beta[[g]]
+    }
+
+
+    df_Y=list()
+    for(g in 1:G){
+      df_Y[[g]]=as.data.frame(mu[[g]]+rmvnorm(pie[g]*N,mean=rep(0,P),sigma=sigma[[g]]))
+      colnames(df_Y[[g]])=paste(rep('Y',P),1:P, sep = "", collapse = NULL)
+      df_Y[[g]]$True_label=g
+    }
+
+    df_X=do.call('rbind',df_X)
+    colnames(df_X)=paste(rep('X',D),1:D-1, sep = "", collapse = NULL)
+
+    df_Y=do.call('rbind',df_Y)
+    df_Labels=as.factor(df_Y$True_label)
+    df_Y=as.matrix(df_Y[,1:P])
+
+
+    df=list(df_Y,df_X,df_Labels)
+    names(df)=c('Y','X','Labels')
+
+    out[[i]]=df
+  }
+
+  return(out)
+
+}

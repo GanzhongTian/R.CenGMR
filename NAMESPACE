@@ -2,6 +2,7 @@
 
 export(MixCenMVReg_EM)
 export(MixCenUVReg_EM)
+export(TrueDataGen)
 import(MomTrunc)
 import(condMVNorm)
 import(matrixStats)
