@@ -14,5 +14,4 @@ Imports:
     condMVNorm,
     matrixStats,
     MomTrunc,
-    mvtnorm,
     truncnorm
