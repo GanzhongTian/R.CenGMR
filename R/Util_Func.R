@@ -361,7 +361,7 @@ eval_class=function(p){
 #'
 #' @return a list of data
 #' @export
-#' @import condMVNorm
+#' @import mvtnorm
 #' @examples
 #' set.seed(22)
 #' BETA=list(matrix(c(2,0,20,-2),nrow=2,ncol=2),matrix(c(3,1,25,-3),nrow=2,ncol=2),matrix(c(3.5,2,30,-5),nrow=2,ncol=2))
