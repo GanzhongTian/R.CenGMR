@@ -31,7 +31,7 @@ v_censnorm<-function(cen_interval=c(-Inf,Inf), mu=0, sig=1){
 #'
 #' @param y a p-dimension vectors of continous values: observed manifest vars
 #' @param c a p-dimension vectors of 0,-1,1 indicating censoring directions
-#' @param m a p-dimension vectors of continous values: means
+#' @param m a p-dimension vectors of continous values: means estimated by the regression
 #' @param v a pxp varcov matrix
 #'
 #' @return a positive real value of the density

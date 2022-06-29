@@ -11,7 +11,7 @@ eval_density(y, c, m, v)
 
 \item{c}{a p-dimension vectors of 0,-1,1 indicating censoring directions}
 
-\item{m}{a p-dimension vectors of continous values: means}
+\item{m}{a p-dimension vectors of continous values: means estimated by the regression}
 
 \item{v}{a pxp varcov matrix}
 }
