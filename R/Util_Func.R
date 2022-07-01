@@ -361,7 +361,7 @@ eval_class=function(p){
 #' @param sigma a list of Sigma matrices
 #'
 #' @return a list of true data for simulation
-#' @import condMVNorm
+#' @import mvtnorm
 #' @export
 #'
 TrueDataGen=function(Replicate=30, n=1000,pie,beta,sigma){
