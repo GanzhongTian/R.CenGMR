@@ -19,7 +19,7 @@ library(ggplot2)
 library(ggpubr)
 ```
 
-Generate of a toy data:
+# Generate of a toy data:
 ```{r,eval=FALSE}
 set.seed(22) 
 
@@ -107,5 +107,9 @@ ggarrange(p1,p2,p3,p4,p5,p6,
 ```{r,echo=FALSE,out.width="100%"}
 
 knitr::include_graphics("figs/Generate.png")
+```
+# Modeling using *MixCensMVReg*:
+```{r}
+
 ```
 
