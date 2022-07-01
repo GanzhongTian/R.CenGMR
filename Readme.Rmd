@@ -12,10 +12,14 @@ You can install singR from github with:
 ```{r,eval=FALSE}
 library(devtools)
 install_github("GanzhongTian/R.CenGMR")
+```
+```{r}
 library(R.CenGMR)
+library(ggplot2)
+library(ggpubr)
 ```
 
-Generate Simulation data and their parameters:
+Generate of a toy data:
 ```{r}
 set.seed(22) 
 
@@ -44,5 +48,33 @@ names(example_true_pars)=c('PIE','BETA','SIGMA')
 #save(example_true_pars,file = "example_true_pars.RData")
 
 example_true=TrueDataGen(1,1000,PIE,BETA,SIGMA)
+```
+
+We can visualize the generated data:
+```{r,out.width="100"}
+data=example_true[[1]]
+data=cbind(data$Y,data$X,data$Labels)
+colnames(data)[5]='Labels'
+data=as.data.frame(data)
+
+p1=ggplot(data, aes(x=Y1, y=Y2, color=as.factor(Labels))) +
+   geom_point() + scale_color_discrete(name = "True Class")+xlab("True Y1")+ylab("True Y2")+
+   lims(x= c(-5,10), y = c(10, 45))+theme(legend.position = "top",text = element_text(size = 20))
+
+
+
+p2=ggplot(data, aes(x=X1, y=Y1, color=as.factor(Labels))) +
+   geom_point() + scale_color_discrete(name = "True Class")+ylab("True Y1")+
+   lims(x= c(-4,4), y = c(-5,10))+theme(legend.position = "top",text = element_text(size = 20))
+
+
+
+p3=ggplot(data, aes(x=X1, y=Y2, color=as.factor(Labels))) +
+   geom_point() + scale_color_discrete(name = "True Class")+ylab("True Y2")+
+   lims(x= c(-4,4), y = c(10,45))+theme(legend.position = "top",text = element_text(size = 20))
+
+ggarrange(p1,p2,p3, 
+          labels = c("A","B","C"),
+          ncol = 3, nrow = 1)
 ```
 
