@@ -10,15 +10,8 @@ install_github("GanzhongTian/R.CenGMR")
 ``` r
 library(R.CenGMR)
 library(ggplot2)
-```
-
-    ## Warning: package 'ggplot2' was built under R version 4.1.3
-
-``` r
 library(ggpubr)
 ```
-
-    ## Warning: package 'ggpubr' was built under R version 4.1.3
 
 Generate of a toy data:
 
@@ -35,65 +28,14 @@ SIGMA=list(matrix(c(1,0.1,0.1,1),nrow=2,ncol=2),
 PIE=c(.1,.7,.2)
 
 message("A vector of Mixing porportions: ")
-```
-
-    ## A vector of Mixing porportions:
-
-``` r
 print(PIE)
-```
 
-    ## [1] 0.1 0.7 0.2
-
-``` r
 message("A list of Beta matrices: ")
-```
-
-    ## A list of Beta matrices:
-
-``` r
 print(BETA)
-```
 
-    ## [[1]]
-    ##      [,1] [,2]
-    ## [1,]    2   20
-    ## [2,]    0   -2
-    ## 
-    ## [[2]]
-    ##      [,1] [,2]
-    ## [1,]    3   25
-    ## [2,]    1   -3
-    ## 
-    ## [[3]]
-    ##      [,1] [,2]
-    ## [1,]  3.5   30
-    ## [2,]  2.0   -5
-
-``` r
 message("A list of Sigma matrices: ")
-```
-
-    ## A list of Sigma matrices:
-
-``` r
 print(SIGMA)
 ```
-
-    ## [[1]]
-    ##      [,1] [,2]
-    ## [1,]  1.0  0.1
-    ## [2,]  0.1  1.0
-    ## 
-    ## [[2]]
-    ##      [,1] [,2]
-    ## [1,]  2.0  0.2
-    ## [2,]  0.2  0.5
-    ## 
-    ## [[3]]
-    ##      [,1] [,2]
-    ## [1,]  0.5  0.3
-    ## [2,]  0.3  2.0
 
 ``` r
 example_true_pars=list(PIE,BETA,SIGMA)
@@ -132,4 +74,4 @@ ggarrange(p1,p2,p3,
           ncol = 3, nrow = 1)
 ```
 
-<img src="Readme_files/figure-markdown_github/unnamed-chunk-5-1.png" width="100" />
+<img src="figs/True data class.png" width="100%" />

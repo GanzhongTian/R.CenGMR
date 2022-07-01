@@ -13,14 +13,14 @@ You can install singR from github with:
 library(devtools)
 install_github("GanzhongTian/R.CenGMR")
 ```
-```{r}
+```{r,eval=FALSE}
 library(R.CenGMR)
 library(ggplot2)
 library(ggpubr)
 ```
 
 Generate of a toy data:
-```{r}
+```{r,eval=FALSE}
 set.seed(22) 
 
 BETA=list(matrix(c(2,0,20,-2),nrow=2,ncol=2),
@@ -42,7 +42,7 @@ message("A list of Sigma matrices: ")
 print(SIGMA)
 ```
 
-```{r}
+```{r,eval=FALSE}
 example_true_pars=list(PIE,BETA,SIGMA)
 names(example_true_pars)=c('PIE','BETA','SIGMA')
 #save(example_true_pars,file = "example_true_pars.RData")
@@ -51,7 +51,7 @@ example_true=TrueDataGen(1,1000,PIE,BETA,SIGMA)
 ```
 
 We can visualize the generated data:
-```{r,out.width="100"}
+```{r,eval=FALSE}
 data=example_true[[1]]
 data=cbind(data$Y,data$X,data$Labels)
 colnames(data)[5]='Labels'
@@ -76,5 +76,8 @@ p3=ggplot(data, aes(x=X1, y=Y2, color=as.factor(Labels))) +
 ggarrange(p1,p2,p3, 
           labels = c("A","B","C"),
           ncol = 3, nrow = 1)
+```
+```{r,echo=FALSE,out.width="100%"}
+knitr::include_graphics("figs/True data class.png")
 ```
 
