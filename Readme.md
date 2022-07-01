@@ -43,6 +43,12 @@ names(example_true_pars)=c('PIE','BETA','SIGMA')
 #save(example_true_pars,file = "example_true_pars.RData")
 
 example_true=TrueDataGen(1,1000,PIE,BETA,SIGMA)
+
+# Define detection limits
+DL=list(c(2.5,10),
+        c(0,26.5))
+
+example_censored=CensDataGen(example_true,DL)
 ```
 
 We can visualize the generated data:
@@ -69,9 +75,29 @@ p3=ggplot(data, aes(x=X1, y=Y2, color=as.factor(Labels))) +
    geom_point() + scale_color_discrete(name = "True Class")+ylab("True Y2")+
    lims(x= c(-4,4), y = c(10,45))+theme(legend.position = "top",text = element_text(size = 20))
 
-ggarrange(p1,p2,p3, 
-          labels = c("A","B","C"),
-          ncol = 3, nrow = 1)
+
+data=example_censored[[1]]
+data=cbind(data$Y,data$X,data$Labels)
+colnames(data)[5]='Labels'
+data=as.data.frame(data)
+
+p4=ggplot(data, aes(x=Y1, y=Y2, color=as.factor(Labels))) +
+   geom_point() + scale_color_discrete(name = "True Class")+xlab("Observed Y1")+ylab("Observed Y2")+
+   lims(x= c(-5,10), y = c(10, 45))+theme(legend.position = "none",text = element_text(size = 20))
+
+
+p5=ggplot(data, aes(x=X1, y=Y1, color=as.factor(Labels))) +
+   geom_point() + scale_color_discrete(name = "True Class")+ylab("Observed Y1")+
+   lims(x= c(-4,4), y = c(-5,10))+theme(legend.position = "none",text = element_text(size = 20))
+
+
+p6=ggplot(data, aes(x=X1, y=Y2, color=as.factor(Labels))) +
+   geom_point() + scale_color_discrete(name = "True Class")+ylab("Observed Y2")+
+
+
+ggarrange(p1,p2,p3,p4,p5,p6, 
+          labels = c("A","B","C","D","E","F"),
+          ncol = 3, nrow = 2)
 ```
 
-<img src="figs/True data class.png" width="100%" />
+<img src="figs/Generate.png" width="100%" />
