@@ -15,7 +15,7 @@ install_github("GanzhongTian/R.CenGMR")
 library(R.CenGMR)
 ```
 
-Generate Simulation data:
+Generate Simulation data and their parameters:
 ```{r}
 set.seed(22) 
 
@@ -36,5 +36,13 @@ print(BETA)
 
 message("A list of Sigma matrices: ")
 print(SIGMA)
+```
+
+```{r}
+example_true_pars=list(PIE,BETA,SIGMA)
+names(example_true_pars)=c('PIE','BETA','SIGMA')
+#save(example_true_pars,file = "example_true_pars.RData")
+
+example_true=TrueDataGen(1,1000,PIE,BETA,SIGMA)
 ```
 
