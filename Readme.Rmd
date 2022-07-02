@@ -15,6 +15,7 @@ install_github("GanzhongTian/R.CenGMR")
 ```
 ```{r,eval=TRUE}
 library(R.CenGMR)
+library(matrixStats)
 library(ggplot2)
 library(ggpubr)
 ```
@@ -137,6 +138,78 @@ testMV2=MixCenMVReg_EM(Y=example_censored$Y,
                        Max.iter=1000, diff.tol=1e-2, print=T)
 
 # Note that we used a new seed, and the EM converged to a similar solution as testMV1, but with switched labels
+
+```
+
+## Visualization for the output
+```{r,eval=FALSE}
+
+data=example_censored
+data=cbind(data$Y,data$X,data$Labels)
+colnames(data)[5]='Labels'
+data=as.data.frame(data)
+data$Labels=factor(testMV1$Class) # input the model cluster label.
+
+
+p7=ggplot(data, aes(x=Y1, y=Y2, color=as.factor(Labels))) +
+   geom_point() + scale_color_discrete(name = "GMR")+xlab("Observed Y1")+ylab("Observed Y2")+
+   lims(x= c(-5,10), y = c(10, 45))+theme(legend.position = "top",text = element_text(size = 15))
+
+
+p8=ggplot(data, aes(x=X1, y=Y1, color=as.factor(Labels))) +
+   geom_point() + scale_color_discrete(name = "GMR")+ylab("Observed Y1")+
+   lims(x= c(-4,4), y = c(-5,10))+theme(legend.position = "top",text = element_text(size = 15))
+
+
+p9=ggplot(data, aes(x=X1, y=Y2, color=as.factor(Labels))) +
+   geom_point() + scale_color_discrete(name = "GMR")+ylab("Observed Y2")+
+  lims(x= c(-4,4), y = c(10,45))+theme(legend.position = "top",text = element_text(size = 15))
+
+ggarrange(p7,p8,p9,ncol=3)
+
+```
+```{r,echo=FALSE}
+knitr::include_graphics("figs/GMRcluster.png")
+```
+
+## Predict the probability of each group with Y1, Y2 and X.
+```{r,eval=TRUE}
+
+
+input=data.frame(Y1=5,Y2=20,X=2)
+Y=t(as.matrix(c(input$Y1,input$Y2))) 
+C=Y*0
+# the limit for Ab42 is (200,1700)
+if(Y[1,1]==2.5){C[1,1]=-1} else if(Y[1,1]==10) {c[1,1]=1}
+
+# the limit for tTau is (80,   )
+if(Y[1,2]==0){C[1,2]=-1} else if(Y[1,2]==26.5) {c[1,2]=1}
+
+
+X=t(as.matrix(c(1,input$X))) # dimension 1 x 2
+
+G=length(testMV1$Pie)
+
+log.ind_density=matrix(NA,nrow=1,ncol=G)
+mu_hat=list()
+
+
+for(g in 1:G){
+  mu_hat[[g]]=as.numeric(X)%*%testMV1$Beta[[g]] #Linear regression model to use covariates to predict the miu for the two biomarkers, dimension 1 x 2 
+  log.ind_density[,g]=log(testMV1$Pie[g])+eval_density(Y,C,mu_hat[[g]],testMV1$Sigma[[g]])
+}
+
+p=exp(sweep(log.ind_density, 1, apply(log.ind_density,1,logSumExp)))
+colnames(p)=c("Class 1","Class 2","Class 3")
+p=t(as.matrix(p[, order(colnames(p))]))
+
+print(p)
+        
+
+
+
+
+
 
 ```
 
