@@ -10,10 +10,17 @@ install_github("GanzhongTian/R.CenGMR")
 ``` r
 library(R.CenGMR)
 library(ggplot2)
+```
+
+    ## Warning: package 'ggplot2' was built under R version 4.1.3
+
+``` r
 library(ggpubr)
 ```
 
-Generate of a toy data:
+    ## Warning: package 'ggpubr' was built under R version 4.1.3
+
+# Generate of a toy data:
 
 ``` r
 set.seed(22) 
@@ -28,14 +35,65 @@ SIGMA=list(matrix(c(1,0.1,0.1,1),nrow=2,ncol=2),
 PIE=c(.1,.7,.2)
 
 message("A vector of Mixing porportions: ")
+```
+
+    ## A vector of Mixing porportions:
+
+``` r
 print(PIE)
+```
 
+    ## [1] 0.1 0.7 0.2
+
+``` r
 message("A list of Beta matrices: ")
-print(BETA)
+```
 
+    ## A list of Beta matrices:
+
+``` r
+print(BETA)
+```
+
+    ## [[1]]
+    ##      [,1] [,2]
+    ## [1,]    2   20
+    ## [2,]    0   -2
+    ## 
+    ## [[2]]
+    ##      [,1] [,2]
+    ## [1,]    3   25
+    ## [2,]    1   -3
+    ## 
+    ## [[3]]
+    ##      [,1] [,2]
+    ## [1,]  3.5   30
+    ## [2,]  2.0   -5
+
+``` r
 message("A list of Sigma matrices: ")
+```
+
+    ## A list of Sigma matrices:
+
+``` r
 print(SIGMA)
 ```
+
+    ## [[1]]
+    ##      [,1] [,2]
+    ## [1,]  1.0  0.1
+    ## [2,]  0.1  1.0
+    ## 
+    ## [[2]]
+    ##      [,1] [,2]
+    ## [1,]  2.0  0.2
+    ## [2,]  0.2  0.5
+    ## 
+    ## [[3]]
+    ##      [,1] [,2]
+    ## [1,]  0.5  0.3
+    ## [2,]  0.3  2.0
 
 ``` r
 example_true_pars=list(PIE,BETA,SIGMA)
@@ -93,6 +151,7 @@ p5=ggplot(data, aes(x=X1, y=Y1, color=as.factor(Labels))) +
 
 p6=ggplot(data, aes(x=X1, y=Y2, color=as.factor(Labels))) +
    geom_point() + scale_color_discrete(name = "True Class")+ylab("Observed Y2")+
+  lims(x= c(-4,4), y = c(10,45))+theme(legend.position = "none",text = element_text(size = 20))
 
 
 ggarrange(p1,p2,p3,p4,p5,p6, 
@@ -100,4 +159,75 @@ ggarrange(p1,p2,p3,p4,p5,p6,
           ncol = 3, nrow = 2)
 ```
 
-<img src="figs/Generate.png" width="100%" />
+<img src="figs/Generate.png" width="100%" /> \# Modeling using
+*MixCensMVReg*
+
+``` r
+example_true=example_true[[1]]
+example_censored=example_censored[[1]]
+```
+
+## Initialize from a given parameter setting
+
+``` r
+# Note in this case we do not need to set the number of components G=
+# The algorithm will run as long as the length of the inital parameters agree.
+# Note how the estimated pies are similar to (0.1,0.7,0.2)
+testMV1=MixCenMVReg_EM(Y=example_censored$Y,
+                       X=example_censored$X,
+                       C=example_censored$censorID, 
+                       pie_hat=PIE, beta_hat=BETA, sigma_hat=SIGMA,
+                       Max.iter=1000, diff.tol=1e-2, print=T)
+```
+
+    ## [1] "The Info matrix for coefficients is not computed"
+    ## [1] "Total Iteration = 10"
+    ## [1] "Convergence = TRUE"
+    ## [1] "LogLik = -2568.644"
+    ##      pie1      pie2      pie3 
+    ## 0.1055041 0.7017313 0.1927646 
+    ## $beta1
+    ##            Y1       Y2
+    ## X0  1.9929312 20.22026
+    ## X1 -0.3095638 -1.92509
+    ## 
+    ## $beta2
+    ##           Y1        Y2
+    ## X0 3.0177890 24.984099
+    ## X1 0.9178073 -3.017309
+    ## 
+    ## $beta3
+    ##          Y1        Y2
+    ## X0 3.570595 30.284829
+    ## X1 1.914615 -4.943377
+    ## 
+    ## $sigma1
+    ##           Y1        Y2
+    ## Y1 0.9307757 0.1119727
+    ## Y2 0.1119727 1.4416285
+    ## 
+    ## $sigma2
+    ##           Y1        Y2
+    ## Y1 1.8952608 0.1406214
+    ## Y2 0.1406214 0.4350703
+    ## 
+    ## $sigma3
+    ##           Y1        Y2
+    ## Y1 0.5025928 0.2717128
+    ## Y2 0.2717128 2.0586493
+
+![](Readme_files/figure-markdown_github/unnamed-chunk-8-1.png)
+
+## Initialize from a random initialization
+
+``` r
+set.seed(1234) 
+
+testMV2=MixCenMVReg_EM(Y=example_censored$Y,
+                       X=example_censored$X,
+                       C=example_censored$censorID, 
+                       G=3,
+                       Max.iter=1000, diff.tol=1e-2, print=T)
+
+# Note that we used a new seed, and the EM converged to a similar solution as testMV1, but with switched labels
+```

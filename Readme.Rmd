@@ -13,14 +13,14 @@ You can install singR from github with:
 library(devtools)
 install_github("GanzhongTian/R.CenGMR")
 ```
-```{r,eval=FALSE}
+```{r,eval=TRUE}
 library(R.CenGMR)
 library(ggplot2)
 library(ggpubr)
 ```
 
 # Generate of a toy data:
-```{r,eval=FALSE}
+```{r,eval=TRUE}
 set.seed(22) 
 
 BETA=list(matrix(c(2,0,20,-2),nrow=2,ncol=2),
@@ -42,7 +42,7 @@ message("A list of Sigma matrices: ")
 print(SIGMA)
 ```
 
-```{r,eval=FALSE}
+```{r,eval=TRUE}
 example_true_pars=list(PIE,BETA,SIGMA)
 names(example_true_pars)=c('PIE','BETA','SIGMA')
 #save(example_true_pars,file = "example_true_pars.RData")
@@ -108,8 +108,35 @@ ggarrange(p1,p2,p3,p4,p5,p6,
 
 knitr::include_graphics("figs/Generate.png")
 ```
-# Modeling using *MixCensMVReg*:
+# Modeling using *MixCensMVReg*
 ```{r}
+example_true=example_true[[1]]
+example_censored=example_censored[[1]]
+```
+
+## Initialize from a given parameter setting
+```{r}
+# Note in this case we do not need to set the number of components G=
+# The algorithm will run as long as the length of the inital parameters agree.
+# Note how the estimated pies are similar to (0.1,0.7,0.2)
+testMV1=MixCenMVReg_EM(Y=example_censored$Y,
+                       X=example_censored$X,
+                       C=example_censored$censorID, 
+                       pie_hat=PIE, beta_hat=BETA, sigma_hat=SIGMA,
+                       Max.iter=1000, diff.tol=1e-2, print=T)
+```
+
+## Initialize from a random initialization
+```{r,eval=FALSE}
+set.seed(1234) 
+
+testMV2=MixCenMVReg_EM(Y=example_censored$Y,
+                       X=example_censored$X,
+                       C=example_censored$censorID, 
+                       G=3,
+                       Max.iter=1000, diff.tol=1e-2, print=T)
+
+# Note that we used a new seed, and the EM converged to a similar solution as testMV1, but with switched labels
 
 ```
 
