@@ -225,7 +225,7 @@ eval_r=function(y,c,m,v){
       v_cond=(v_cond+t(v_cond))/2
       m_cond=as.vector(m_reorder[1:D_cen]+v12%*%solve(v22)%*%(y_reorder[-(1:D_cen)]-m_reorder[-(1:D_cen)]))
 
-      subS_star_reorder=meanvarTMD(lbd,ubd,m_cond,v_cond,dist="normal")$varcov
+      subS_star_reorder=MomTrunc::meanvarTMD(lbd,ubd,m_cond,v_cond,dist="normal")$varcov
       #             subS_star_reorder=MCmeanvarTMD(lbd,ubd,m_cond,v_cond,dist="normal")$EYY
 
       S_star_reorder=matrix(rep(0,D_tot^2),nrow=D_tot,ncol=D_tot)
