@@ -15,7 +15,7 @@ install_github("GanzhongTian/R.CenGMR")
 ```
 ```{r,eval=TRUE}
 library(R.CenGMR)
-library(matrixStats)
+#library(matrixStats)
 library(ggplot2)
 library(ggpubr)
 ```
