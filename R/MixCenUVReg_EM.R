@@ -163,12 +163,12 @@ MixCenUVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
 
         log.ind_density[is.infinite(log.ind_density)]=-999
 
-        new_tau_hat=exp(sweep(log.ind_density, 1, apply(log.ind_density,1,logSumExp))) #(NxG)
+        new_tau_hat=exp(sweep(log.ind_density, 1, apply(log.ind_density,1,matrixStats::logSumExp))) #(NxG)
 
         # new_tau_hat=ind_density/apply(ind_density,1,sum) #(NxG)
 
         # new_tau_hat[is.na(new_tau_hat)]=1/G # adjust the nans
-        obs.LogLik=sum(apply(log.ind_density,1,logSumExp))
+        obs.LogLik=sum(apply(log.ind_density,1,matrixStats::logSumExp))
 
         all_obs.LogLik=append(all_obs.LogLik,obs.LogLik)
 
@@ -189,8 +189,8 @@ MixCenUVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
             for(g in 1:G){
         # comput truncated normal 1st moment
                 Y_star[[g]]=((C==0)*Y
-                             +(C==-1)*etruncnorm(a=-Inf, b=Y, mean=mu_hat[[g]], sd=sigma_hat[[g]])
-                             +(C==1)*etruncnorm(a=Y, b=Inf, mean=mu_hat[[g]], sd=sigma_hat[[g]]))
+                             +(C==-1)*truncnorm::etruncnorm(a=-Inf, b=Y, mean=mu_hat[[g]], sd=sigma_hat[[g]])
+                             +(C==1)*truncnorm::etruncnorm(a=Y, b=Inf, mean=mu_hat[[g]], sd=sigma_hat[[g]]))
 
 
     #             Y_star=mapply(eval_ystar, Y, C, mu_hat[[g]], sigma_hat[[g]])
@@ -209,10 +209,10 @@ MixCenUVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
                     return((y-mu)^2)
                 }
                 if(c==1){
-                    return((etruncnorm(a=y, b=Inf, mean=mu, sd=sigma)-mu)^2+v_censnorm(c(y,Inf), mu, sigma)) # v_censnorm is defined in utils.R
+                    return((truncnorm::etruncnorm(a=y, b=Inf, mean=mu, sd=sigma)-mu)^2+v_censnorm(c(y,Inf), mu, sigma)) # v_censnorm is defined in utils.R
                 }
                 if(c==-1){
-                    return((etruncnorm(a=-Inf, b=y, mean=mu, sd=sigma)-mu)^2+v_censnorm(c(-Inf,y), mu, sigma))
+                    return((truncnorm::etruncnorm(a=-Inf, b=y, mean=mu, sd=sigma)-mu)^2+v_censnorm(c(-Inf,y), mu, sigma))
                 }
             }
             S_star=list()

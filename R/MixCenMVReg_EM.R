@@ -155,7 +155,7 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
       # print(dim(apply(log.ind_density,1,logSumExp)))
       ## E-step: computing the conditional posterior probabilities tau_hat
       # tau_hat=ind_density/apply(ind_density,1,sum) #(NxG)
-      new_tau_hat=exp(sweep(log.ind_density, 1, apply(log.ind_density,1,logSumExp)))
+      new_tau_hat=exp(sweep(log.ind_density, 1, apply(log.ind_density,1,matrixStats::logSumExp)))
       # tau_hat[is.na(tau_hat)]=1/G # adjust the nans
 
       # tau_hat[tau_hat< 1e-300]=1e-300 # adjust the 0
@@ -164,7 +164,7 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
       # Evaluate Likelihood using the ind_density for convenience
       # obs.LogLik=sum(log(apply(ind_density,1,sum)))
 
-      obs.LogLik=sum(apply(log.ind_density,1,logSumExp))
+      obs.LogLik=sum(apply(log.ind_density,1,matrixStats::logSumExp))
 
       # if(length(all_obs.LogLik)>1){
       #    if(obs.LogLik<tail(all_obs.LogLik, n=1)){

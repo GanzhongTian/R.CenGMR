@@ -37,6 +37,7 @@ v_censnorm<-function(cen_interval=c(-Inf,Inf), mu=0, sig=1){
 #' @return a positive real value of the density
 #' @export
 #' @import condMVNorm
+#' @import mvtnorm
 #'
 eval_density=function(y,c,m,v){
   ##############################################
@@ -58,7 +59,7 @@ eval_density=function(y,c,m,v){
     v_obs=as.matrix(v[(obslst),(obslst)])
 
     # f_obs=dmvnorm(y_obs,m_obs,v_obs)
-    log.f_obs=dmvnorm(y_obs,m_obs,v_obs,log=T)
+    log.f_obs=mvtnorm::dmvnorm(y_obs,m_obs,v_obs,log=T)
   }else{
     # f_obs=1
     log.f_obs=0
@@ -77,7 +78,7 @@ eval_density=function(y,c,m,v){
     ubd[c[cenlst]==1]=Inf
 
     # p_cen=pcmvnorm(lower=lbd, upper=ubd, mean=m, sigma=v, dep=cenlst, given=obslst, X=y[obslst])
-    log.p_cen=log(pcmvnorm(lower=lbd, upper=ubd, mean=m, sigma=v, dep=cenlst, given=obslst, X=y[obslst]))
+    log.p_cen=log(condMVNorm::pcmvnorm(lower=lbd, upper=ubd, mean=m, sigma=v, dep=cenlst, given=obslst, X=y[obslst]))
   }else{
     # p_cen=1
     log.p_cen=0
@@ -149,13 +150,13 @@ eval_ystar=function(y,c,m,v){
       v_cond=(v_cond+t(v_cond))/2 # Force it to be symmetric
       m_cond=as.vector(m_reorder[1:D_cen]+v12%*%solve(v22)%*%(y_reorder[-(1:D_cen)]-m_reorder[-(1:D_cen)]))
 
-      e_y[cenlst]=as.vector(onlymeanTMD(lbd,ubd,m_cond,v_cond,dist="normal"))
+      e_y[cenlst]=as.vector(MomTrunc::onlymeanTMD(lbd,ubd,m_cond,v_cond,dist="normal"))
 
       return(e_y)
 
     }else{
 
-      e_y[cenlst]=as.vector(onlymeanTMD(lbd, ubd, m ,v ,dist="normal"))
+      e_y[cenlst]=as.vector(MomTrunc::onlymeanTMD(lbd, ubd, m ,v ,dist="normal"))
 
       return(e_y)
     }
@@ -242,7 +243,7 @@ eval_r=function(y,c,m,v){
 
     }else{
 
-      S_star=meanvarTMD(lower=lbd,upper=ubd,mu=m,Sigma=v,dist="normal")$varcov
+      S_star=MomTrunc::meanvarTMD(lower=lbd,upper=ubd,mu=m,Sigma=v,dist="normal")$varcov
       #             S_star=MCmeanvarTMD(lower=lbd,upper=ubd,mu=m,Sigma=v,dist="normal")$EYY
 
       return(S_star)
@@ -388,7 +389,7 @@ TrueDataGen=function(Replicate=30, n=1000,pie,beta,sigma){
 
     df_Y=list()
     for(g in 1:G){
-      df_Y[[g]]=as.data.frame(mu[[g]]+rmvnorm(pie[g]*N,mean=rep(0,P),sigma=sigma[[g]]))
+      df_Y[[g]]=as.data.frame(mu[[g]]+mvtnorm::rmvnorm(pie[g]*N,mean=rep(0,P),sigma=sigma[[g]]))
       colnames(df_Y[[g]])=paste(rep('Y',P),1:P, sep = "", collapse = NULL)
       df_Y[[g]]$True_label=g
     }
