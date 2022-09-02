@@ -77,8 +77,15 @@ eval_density=function(y,c,m,v){
     ubd[c[cenlst]==-1]=y[c==-1]
     ubd[c[cenlst]==1]=Inf
 
-    # p_cen=pcmvnorm(lower=lbd, upper=ubd, mean=m, sigma=v, dep=cenlst, given=obslst, X=y[obslst])
-    log.p_cen=log(condMVNorm::pcmvnorm(lower=lbd, upper=ubd, mean=m, sigma=v, dep=cenlst, given=obslst, X=y[obslst]))
+    p_cen=pcmvnorm(lower=lbd, upper=ubd, mean=m, sigma=v, dep=cenlst, given=obslst, X=y[obslst])
+
+    if(p_cen<0){
+      log.p_cen=-Inf
+    }else{
+      # log.p_cen=log(pcmvnorm(lower=lbd, upper=ubd, mean=m, sigma=v, dep=cenlst, given=obslst, X=y[obslst]))
+
+      log.p_cen=log(p_cen)
+    }
   }else{
     # p_cen=1
     log.p_cen=0
