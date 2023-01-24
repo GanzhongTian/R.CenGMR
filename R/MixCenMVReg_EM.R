@@ -239,43 +239,66 @@ MixCenMVReg_EM=function(Y, C, X, G=2, Max.iter=1000,
 
   if(calc_cov==TRUE){
 
-#       if(G>1){
-#         score_pie=list()
-#         for(g in 1:(G-1)){
-#           score_pie[[g]]=tau_hat[,g]/pie_hat[g]-tau_hat[,G]/pie_hat[G]
-#         }
-#         score_pie=do.call('cbind',score_pie)
-#         colnames(score_pie)=combine(c("PIE"),1:(G-1))
+      if(G>1){
+        score_pie=list()
+        for(g in 1:(G-1)){
+          score_pie[[g]]=tau_hat[,g]/pie_hat[g]-tau_hat[,G]/pie_hat[G]
+        }
+        score_pie=do.call('cbind',score_pie)
+        colnames(score_pie)=combine(c("PIE"),1:(G-1))
 
-#       }else{
-#         score_pie=NULL
-#       }
+      }else{
+        score_pie=NULL
+      }
 
 
       score_beta=list()
-
       for(g in 1:G){
 
         score_beta[[g]]=t(mapply(eval_betascore,
                                  yc=split(t((tau_hat[,g]*(Y_star[[g]]-mu_hat[[g]])%*%solve(sigma_hat[[g]]))), rep(1:N, each = P)),
                                  x=split(t(X), rep(1:N, each = D))))
 
-        colnames(score_beta[[g]])=combine(colnames(Y),colnames(X),c(g))
+        colnames(score_beta[[g]])=combine(c("BETA"),colnames(Y),colnames(X),c(g))
       }
       score_beta=do.call('cbind',score_beta)
 
-      # score_sigma=list()
-      # for(g in 1:G){
-      #     score_sigma[[g]]=tau_hat[,g]*(S_star[[g]]-(sigma_hat[g])^2)/(2*(sigma_hat[g])^4)
-      # }
-      # score_sigma=do.call('cbind',score_sigma)
+      score_sigma=list()
+      for(g in 1:G){
+          # score_sigma[[g]]=tau_hat[,g]*(S_star[[g]]-(sigma_hat[g])^2)/(2*(sigma_hat[g])^4)
+          s=split(t(Y_star[[g]]-mu_hat[[g]]), rep(1:N, each = P))
+          
+          r=mapply(eval_r,
+                 y=split(t(Y), rep(1:N, each = P)),
+                 c=split(t(C), rep(1:N, each = P)),
+                 m=split(t(mu_hat[[g]]), rep(1:N, each = P)), MoreArgs=list(v=sigma_hat[[g]]))
+          # rr=matrix(apply(t(r)*tau_hat[,g],2,sum),nrow=P,ncol=P)
+          # rr=mapply(matrix,split(t(r), rep(1:N, each = P)),nrow=P,ncol=P)
+          # xx=solve(sigma_hat[[g]])%*%(ss+rr-sigma_hat[[g]])%*%solve(sigma_hat[[g]])*0.5
+          # rr=lapply(split(t(r), rep(1:N, each = P)), matrix, nrow=P,ncol=P) 
+          rr=lapply(split(r, rep(1:N, each = P^2)), matrix, nrow=P,ncol=P)
+          
+          score_sigma[[g]]=list()
+          for(i in 1:N){
+              score_sigma[[g]][[i]]=0.5*tau_hat[i,g]*solve(sigma_hat[[g]])%*%(as.matrix(s[[i]])%*%t(as.matrix(s[[i]]))+rr[[i]]-sigma_hat[[g]])%*%solve(sigma_hat[[g]])
+          }
+          score_sigma[[g]]=t(mapply(as.vector,score_sigma[[g]]))
+          
+          colnames(score_sigma[[g]])=combine(c("SIGMA"),colnames(Y),colnames(Y),c(g))
+          
+          sigma_m=matrix(1:P^2, P, P)
+          score_sigma[[g]]=score_sigma[[g]][,sort(c(sigma_m[lower.tri(sigma_m)],diag(sigma_m)))]
+      }
+      # print(score_sigma)
+      score_sigma=do.call('cbind',score_sigma)
 
-      # all_score=cbind(score_pie,score_beta,score_sigma)
-#       if(is.null(score_pie)){
-        all_score=cbind(score_beta)
-#       }else{
-#         all_score=cbind(score_pie,score_beta)
-#       }
+      # all_score=cbind(score_pie,score_beta)
+      # all_score=cbind(score_beta)
+      if(is.null(score_pie)){
+          all_score=cbind(score_beta,score_sigma)
+      }else{
+          all_score=cbind(score_pie,score_beta,score_sigma)
+      }
 
       obs_Info=t(all_score)%*%all_score
 
