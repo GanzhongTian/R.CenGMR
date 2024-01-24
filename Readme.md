@@ -26,7 +26,7 @@ library(ggpubr)
 
     ## Warning: package 'ggpubr' was built under R version 4.1.3
 
-# Generate of a toy data:
+# Generate a toy data:
 
 ``` r
 set.seed(22) 
