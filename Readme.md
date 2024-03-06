@@ -1,6 +1,6 @@
 ## Installation
 
-You can install singR from github with:
+You can install R.CenGMR from github with:
 
 ``` r
 library(devtools)
