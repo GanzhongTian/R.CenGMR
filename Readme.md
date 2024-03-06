@@ -166,7 +166,7 @@ ggarrange(p1,p2,p3,p4,p5,p6,
 ```
 
 <img src="figs/Generate.png" width="100%" /> \# Modeling using
-*MixCensMVReg*
+*R.CenGMR*
 
 ``` r
 example_true=example_true[[1]]
